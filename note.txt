@@ -12,3 +12,47 @@
         機器人：Winston
         地圖：德正
     part2：德正
+
+"""Cargo.py notes"""
+[Parent Class] Cargo
+
+    Fields (屬性):
+        row    : 縱坐標 (0~7)
+        col    : 橫坐標 (0~7)
+        pos    : tuple (row, col) -> 方便比對位置
+        active : True/False (代表貨物是否還在地圖上)
+        name   : 'General Cargo'
+        symbol : 'C'
+    Methods (方法):
+        get_reward()   : 機器人吃到時呼叫，回傳分數，並將 active 設為 False
+        update()       : 每回合開始時呼叫 (主要給限時貨物倒數用)
+        get_position() : 獲取貨物位置 (回傳tuple)
+
+----------------------------------------------------
+[Subclasses] (沒寫的部分即代表繼承自 Cargo)
+
+1. Class GoodCargo (加分):
+    Fields:
+        value  : 10
+        name   : 'Gold'
+        symbol : 'G'
+    Methods:
+        get_reward() : 回傳 10 分
+
+2. Class BadCargo (扣分/陷阱):
+    Fields:
+        value  : -10
+        name   : 'Trash'
+        symbol : 'T'
+    Methods:
+        get_reward() : 回傳 -10 分
+
+3. Class LimitedCargo (限時鑽石):
+    Fields:
+        value  : 30
+        name   : 'Diamond'
+        symbol : 'D'
+        lifetime : 20 (預設存活步數)
+    Methods:
+        get_reward() : 回傳 30 分
+        update()     : 每回合倒數 lifetime，歸零時 active 變 False (消失)

@@ -2,9 +2,10 @@ import random
 
 class Cargo:
     """The base class for different types of cargo."""
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
+    def __init__(self, row, col):
+        self.row = row
+        self.col = col
+        self.pos = (row, col)
         self.active = True # The cargo is on the map
         self.name = "General Cargo"
         self.symbol = "C"
@@ -20,12 +21,12 @@ class Cargo:
 
     def get_position(self):
         """Get the current position of the cargo."""
-        return (self.x, self.y)
+        return self.pos
     
 class GoodCargo(Cargo):
     """The cargo can increase the score of the robot."""
-    def __init__(self, x, y):
-        super().__init__(x, y)
+    def __init__(self, row, col):
+        super().__init__(row, col)
         self.value = 10
         self.name = "Gold"
         self.symbol = "G"
@@ -37,8 +38,8 @@ class GoodCargo(Cargo):
     
 class BadCargo(Cargo):
     """The cargo can decrease the score of the robot."""
-    def __init__(self, x, y):
-        super().__init__(x, y)
+    def __init__(self, row, col):
+        super().__init__(row, col)
         self.value = -10
         self.name = "Trash"
         self.symbol = "T"
@@ -49,8 +50,8 @@ class BadCargo(Cargo):
     
 class LimitedCargo(Cargo):
     """The cargo can increase the score of the robot, but only within a limited time."""
-    def __init__(self, x, y, lifetime = 20):
-        super().__init__(x, y)
+    def __init__(self, row, col, lifetime = 20):
+        super().__init__(row, col)
         self.value = 30
         self.name = "Dimond"
         self.symbol = "D"
