@@ -23,11 +23,11 @@ def run(episodes, is_training=True, render=False):
         q = pickle.load(f)
         f.close()
 
-    min_exploration_rate = 0.01
+    min_exploration_rate = 0.001
     learning_rate_a = 0.9 # alpha or learning rate
     discount_factor_g = 0.9 # gamma or discount rate. Near 0: more weight/reward placed on immediate state. Near 1: more on future state.
     epsilon = 1         # 1 = 100% random actions
-    epsilon_decay_rate = 0.0005        # epsilon decay rate. 1/0.0001 = 10,000
+    epsilon_decay_rate = 0.00008      # epsilon decay rate. 1/0.0001 = 10,000
     rng = np.random.default_rng()   # random number generator
 
     rewards_per_episode = np.zeros(episodes)
@@ -77,6 +77,5 @@ def run(episodes, is_training=True, render=False):
         f.close()
 
 if __name__ == '__main__':
-    # run(15000, is_training=True, render=False)
-
-    run(10, is_training=False, render=True)
+    run(15000, is_training=True, render=False)
+    run(1000, is_training=False, render=False)

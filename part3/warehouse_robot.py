@@ -162,7 +162,7 @@ class WarehouseRobot:
                 if(event.key == pygame.K_ESCAPE):
                     pygame.quit()
                     sys.exit()
-                
+
 
 
 # For unit testing
