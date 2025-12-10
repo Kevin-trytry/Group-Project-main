@@ -23,7 +23,7 @@ def run(episodes, is_training=True, render=False):
 
     if(is_training):
         # 初始 Q table 為 0.1 -> 鼓勵探索
-        q = np.ones((env.observation_space.n, env.action_space.n))  * 0.1
+        q = np.zeros((env.observation_space.n, env.action_space.n))
     else:
         try:
             f = open('frozen_lake8x8.pkl', 'rb')
@@ -48,7 +48,7 @@ def run(episodes, is_training=True, render=False):
     # 4. 探索率：指數衰減
     epsilon = 1.0
     min_exploration_rate = 0.01
-    epsilon_decay_rate = 0.995
+    epsilon_decay_rate = 0.9995
     
     rng = np.random.default_rng()
     rewards_per_episode = np.zeros(episodes)
