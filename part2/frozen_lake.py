@@ -23,7 +23,7 @@ def run(episodes, is_training=True, render=False):
         q = pickle.load(f)
         f.close()
 
-    min_exploration_rate = 0.001
+    min_exploration_rate = 0.0001
     learning_rate_a = 0.9 # alpha or learning rate
     discount_factor_g = 0.9 # gamma or discount rate. Near 0: more weight/reward placed on immediate state. Near 1: more on future state.
     epsilon = 1         # 1 = 100% random actions

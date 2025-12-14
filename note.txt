@@ -56,3 +56,9 @@
     Methods:
         get_reward() : 回傳 30 分
         update()     : 每回合倒數 lifetime，歸零時 active 變 False (消失)
+
+code 修正
+1. map 不要，重構environment - 德正
+2. environment.py 中，貨物的數量可以不要寫死，修改config，讓貨物數量固定，Limit_cargo資料形態要注意 - Winston
+3. Cargo名字改成檔名 - 大莊
+

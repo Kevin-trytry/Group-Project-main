@@ -1,7 +1,7 @@
 import torch
 import time
 from environment import Environment
-from dqn_agent  import DQNAgent
+from ddqn_agent  import DQNAgent
 from config     import Config
 
 def train():

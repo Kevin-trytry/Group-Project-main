@@ -7,8 +7,7 @@ class Cargo:
         self.col = col
         self.pos = (row, col)
         self.active = True # The cargo is on the map
-        self.name = "General Cargo"
-        self.symbol = "C"
+        self.image_file = "cargo.png"
 
     def get_reward(self) :
         """When the robot collects the cargo, it receives a score."""
@@ -28,8 +27,7 @@ class GoodCargo(Cargo):
     def __init__(self, row, col):
         super().__init__(row, col)
         self.value = 30
-        self.name = "Gold"
-        self.symbol = "G"
+        self.image_file = "good.png"
     
     def get_reward(self):
         """When the robot collects the cargo, it receives a score."""
@@ -41,8 +39,7 @@ class BadCargo(Cargo):
     def __init__(self, row, col):
         super().__init__(row, col)
         self.value = -20
-        self.name = "Trash"
-        self.symbol = "T"
+        self.image_file = "bad.png"
     
     def get_reward(self):
         self.active = False # The cargo is collected
@@ -53,8 +50,7 @@ class LimitedCargo(Cargo):
     def __init__(self, row, col, lifetime = 40):
         super().__init__(row, col)
         self.value = 100
-        self.name = "Dimond"
-        self.symbol = "D"
+        self.image_file = "limit.png"
         self.remain_lifetime = lifetime
         self.lifetime = lifetime
 
