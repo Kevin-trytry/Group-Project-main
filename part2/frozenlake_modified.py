@@ -8,21 +8,9 @@ total_win = 0
 def run(episodes, is_training=True, render=False):
     global total_win
 
-    self_map = [
-    "SFFFFFFF",
-    "FFFFFFFF",
-    "FFHFFFFF",
-    "FFFFFHFF",
-    "FFFFFFFH",
-    "HFFFFFFF",
-    "FFFFFFHF",
-    "FFFHFFFG",
-    ]
-
-    env = gym.make('FrozenLake-v1', desc=self_map, is_slippery=True, render_mode='human' if render else None)
+    env = gym.make('FrozenLake-v1', map_name="8x8", is_slippery=True, render_mode='human' if render else None)
 
     if(is_training):
-        # 初始 Q table 為 0.1 -> 鼓勵探索
         q = np.zeros((env.observation_space.n, env.action_space.n))
     else:
         try:
@@ -66,7 +54,9 @@ def run(episodes, is_training=True, render=False):
             if is_training and rng.random() < epsilon:
                 action = env.action_space.sample()
             else:
-                action = np.argmax(q[state,:])
+                max_value = np.max(q[state, :])
+                best_actions = np.where(q[state, :] == max_value)[0]
+                action = rng.choice(best_actions)
 
             new_state, reward, terminated, truncated, _ = env.step(action)
 
