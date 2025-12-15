@@ -26,7 +26,7 @@ def run(episodes, is_training=True, render=False):
     min_lr = 0.01
     
     # 2. 獎懲機制
-    hole_penalty = -0.2
+    hole_penalty = -0.5
     step_penalty = -0.001
     dest_reward = 1.5
 
