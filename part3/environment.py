@@ -43,21 +43,13 @@ class CargoEnv(gym.Env):
         rx, ry = self.game.robot_pos
         obs[0, rx, ry] = 1.0
         
-        # Layer 1: Limited Cargo
-        if self.game.limit_cargo.active:
-            lx, ly = self.game.limit_cargo.pos
-            # 計算生命週期比例
-            obs[1, lx, ly] = self.game.limit_cargo.remain_lifetime / self.game.limit_cargo.lifetime
-            
-        # Layer 2: Good Cargo
-        for item in self.game.good_cargo:
-            if item.active:
-                obs[2, item.row, item.col] = 1.0
-            
-        # Layer 3: Bad Cargo
-        for item in self.game.bad_cargo:
-            if item.active:
-                obs[3, item.row, item.col] = 1.0
+        # Layer 1-3: Cargos (limit, good, bad)     
+        for i in range(self.cfg.CARGO_TYPES):
+            for item in self.game.all_cargos[i]:
+                if i == 0:
+                    obs[1, item.row, item.col] = self.game.all_cargos[0].remain_lifetime / self.game.all_cargos[0].lifetime
+                elif item.acitve:
+                    obs[i+1, item.row, item.col] = 1.0
             
         return obs
 

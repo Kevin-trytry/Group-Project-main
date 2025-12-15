@@ -89,7 +89,7 @@ class CargoGame:
             self.pkg.update()
             
         # 檢查各類包裹
-        for i in range(3):
+        for i in range(self.cfg.CARGO_TYPES):
             for pkg in self.all_cargos[i]:
                 if pkg.active and self.robot_pos == pkg.pos:
                     reward += pkg.get_reward()
@@ -160,7 +160,7 @@ class CargoGame:
             for c in range(self.map_size):
                 canvas.blit(self.sprites['floor'], (c*pix_size, r*pix_size))
         
-        for i in range(3):
+        for i in range(self.cfg.CARGO_TYPES):
             for target in self.all_cargos[i]:
                 if target.active:
                     canvas.blit(self.sprites[target.name], (target.col * pix_size, target.row * pix_size))
