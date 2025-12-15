@@ -28,6 +28,7 @@ class GoodCargo(Cargo):
     def __init__(self, row, col):
         super().__init__(row, col)
         self.value = 30
+        self.name = 'good'
     
     def get_reward(self):
         """When the robot collects the cargo, it receives a score."""
@@ -41,6 +42,7 @@ class BadCargo(Cargo):
     def __init__(self, row, col):
         super().__init__(row, col)
         self.value = -20
+        self.name = 'bad'
         self.image_file = "bad.png"
     
     def get_reward(self):
@@ -54,6 +56,7 @@ class LimitedCargo(Cargo):
     def __init__(self, row, col, lifetime = 40):
         super().__init__(row, col)
         self.value = 100
+        self.name = 'limit'
         self.image_file = "limit.png"
         self.remain_lifetime = lifetime
         self.lifetime = lifetime
