@@ -27,7 +27,7 @@ class GoodCargo(Cargo):
     """The cargo can increase the score of the robot."""
     def __init__(self, row, col):
         super().__init__(row, col)
-        self.value = 30
+        self.value = 50
         self.name = 'good'
     
     def get_reward(self):
@@ -41,7 +41,7 @@ class BadCargo(Cargo):
     """The cargo can decrease the score of the robot."""
     def __init__(self, row, col):
         super().__init__(row, col)
-        self.value = -20
+        self.value = -30
         self.name = 'bad'
         self.image_file = "bad.png"
     
@@ -55,7 +55,7 @@ class LimitedCargo(Cargo):
     """The cargo can increase the score of the robot, but only within a limited time."""
     def __init__(self, row, col, lifetime = 40):
         super().__init__(row, col)
-        self.value = 100
+        self.value = 150
         self.name = 'limit'
         self.image_file = "limit.png"
         self.remain_lifetime = lifetime
@@ -77,4 +77,4 @@ class LimitedCargo(Cargo):
         
         if self.remain_lifetime <= 0:
             self.active = False # The cargo expires
-            print(f"The time is up, limited cargo is expired.")
+            #print(f"The time is up, limited cargo is expired.")

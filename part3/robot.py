@@ -42,24 +42,24 @@ class CargoGame:
         
         # 隨機生成位置
         total_cargo = self.cfg.NUM_LIMIT + self.cfg.NUM_GOOD + self.cfg.NUM_BAD
-        positions = random.sample(range(self.map_size * self.map_size), total_cargo) 
+        positions = random.sample(range(self.map_size * self.map_size), total_cargo+1) 
         coordinates = [self._to_coord(pos) for pos in positions]
         
-        self.robot_pos = tuple(coordinates[0])
-        
-        start = 1
+        start = 0
         end = self.cfg.NUM_LIMIT
         self.limit_cargo = [LimitedCargo(*c) for c in coordinates[start : end]]
         
-        start = self.cfg.NUM_LIMIT + 1
+        start = self.cfg.NUM_LIMIT
         end = self.cfg.NUM_GOOD + self.cfg.NUM_LIMIT
         self.good_cargo = [GoodCargo(*c) for c in coordinates[start : end]]
         
-        start = self.cfg.NUM_LIMIT + self.cfg.NUM_GOOD + 1
+        start = self.cfg.NUM_LIMIT + self.cfg.NUM_GOOD
         end = self.cfg.NUM_LIMIT + self.cfg.NUM_GOOD + self.cfg.NUM_BAD
         self.bad_cargo = [BadCargo(*c) for c in coordinates[start : end]]
 
         self.all_cargos = [self.limit_cargo, self.good_cargo, self.bad_cargo] 
+        
+        self.robot_pos = tuple(coordinates[total_cargo])
         
     def _to_coord(self, idx):
         return (idx // self.map_size, idx % self.map_size)
@@ -86,22 +86,37 @@ class CargoGame:
 
         # 更新限時包裹狀態
         for pkg in self.all_cargos[0]:
-            self.pkg.update()
+            pkg.update()
             
         # 檢查各類包裹
         for i in range(self.cfg.CARGO_TYPES):
             for pkg in self.all_cargos[i]:
                 if pkg.active and self.robot_pos == pkg.pos:
                     reward += pkg.get_reward()
+                    
+        # 額外增加靠近限時包裹的reward，若已經沒有限時包裹了，額外增加靠近最近的包裹的reward
+        targets = [p for p in self.limit_cargo if p.active]
+        if not targets:
+            targets = [p for p in self.good_cargo if p.active]
+            
+        if targets:
+            closest_pkg = min(targets, key=lambda p: abs(rx - p.row) + abs(ry - p.col))
+            px, py = closest_pkg.pos
+            current_dist = abs(rx - px) + abs(ry - py)
+            new_dist = abs(x - px) + abs(y - py)
+    
+            # 若新位置比舊位置更靠近該目標，給予獎勵
+            if new_dist < current_dist:
+                reward += 0.4
             
         # 判斷遊戲是否結束 (Done)
         all_good_collected = True
-        for pkg in self.all_cargos[0]:
+        for pkg in self.limit_cargo:
             if pkg.active:
                 all_good_collected = False
                 break
-            
-        for pkg in self.all_cargos[1]:
+                    
+        for pkg in self.good_cargo:
             if pkg.active:
                 all_good_collected = False
                 break
@@ -112,7 +127,7 @@ class CargoGame:
             reward += 20 # 清空全場獎勵
             
         if self.steps >= self.cfg.MAX_STEPS:
-            done = True  # 超果最大步數
+            done = True  # 超過最大步數
             
         self.score += reward
         return reward, done

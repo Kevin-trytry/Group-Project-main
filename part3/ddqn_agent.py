@@ -54,8 +54,8 @@ class DQNAgent:
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         
         # 兩個網路：Policy Net (更新快), Target Net (更新慢，為了穩定)
-        self.policy_net = DQN((self.cfg.CARGO_TYPES, self.cfg.MAP_SIZE, self.cfg.MAP_SIZE), 4).to(self.device)
-        self.target_net = DQN((self.cfg.CARGO_TYPES, self.cfg.MAP_SIZE, self.cfg.MAP_SIZE), 4).to(self.device)
+        self.policy_net = DQN((self.cfg.CARGO_TYPES+1, self.cfg.MAP_SIZE, self.cfg.MAP_SIZE), 4).to(self.device)
+        self.target_net = DQN((self.cfg.CARGO_TYPES+1, self.cfg.MAP_SIZE, self.cfg.MAP_SIZE), 4).to(self.device)
         self.target_net.load_state_dict(self.policy_net.state_dict()) # 同步權重
         self.target_net.eval() # Target Net 不需訓練
         

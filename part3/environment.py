@@ -47,8 +47,8 @@ class CargoEnv(gym.Env):
         for i in range(self.cfg.CARGO_TYPES):
             for item in self.game.all_cargos[i]:
                 if i == 0:
-                    obs[1, item.row, item.col] = self.game.all_cargos[0].remain_lifetime / self.game.all_cargos[0].lifetime
-                elif item.acitve:
+                    obs[1, item.row, item.col] = item.remain_lifetime / item.lifetime
+                elif item.active:
                     obs[i+1, item.row, item.col] = 1.0
             
         return obs
