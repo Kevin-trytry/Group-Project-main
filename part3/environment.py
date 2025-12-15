@@ -1,167 +1,108 @@
 import gymnasium as gym
+from gymnasium import spaces
 import numpy as np
-import random
-import pygame
-import os
-from os import path
-from config import Config
-from cargo import GoodCargo, BadCargo, LimitedCargo
+from gymnasium.envs.registration import register
 
-class Environment:
-    def __init__(self, Config, render_mode=None):
-        self.cfg = Config
+import robot as rb  # 匯入遊戲邏輯
+from config import Config
+
+# 註冊環境 ID
+register(
+    id='cargo-env-v0',
+    entry_point='cargo_env:CargoEnv',
+)
+
+class CargoEnv(gym.Env):
+    metadata = {"render_modes": ["human", "rgb_array"], 'render_fps': 4}
+
+    def __init__(self, render_mode=None):
+        self.cfg = Config()
         self.render_mode = render_mode
         self.map_size = self.cfg.MAP_SIZE
-        self.state_dim = (4, self.cfg.MAP_SIZE, self.cfg.MAP_SIZE) 
-        self.action_space = 4 
         
-        if self.render_mode == 'human':
-            self._init_pygame()       
+        # 實例化遊戲核心 (Logic)
+        # render_on 決定是否開啟 pygame 視窗
+        self.game = rb.CargoGame(config=self.cfg, render_on=(render_mode == 'human'))
         
-        self.reset()
-    
-    def reset(self):
-        self.steps = 0
+        # 定義 Action Space (0, 1, 2, 3)
+        self.action_space = spaces.Discrete(len(rb.RobotAction))
         
-        positions = random.sample(range(self.map_size * self.map_size), 7) 
-        coordinates = [self._to_coord(pos) for pos in positions]
-        
-        self.robot_pos = tuple(coordinates[0])
-        self.limit_cargo = LimitedCargo(*coordinates[1])
-        self.good_cargo = [GoodCargo(*coordinates[2]), GoodCargo(*coordinates[3]), GoodCargo(*coordinates[4])]
-        self.bad_cargo = [BadCargo(*coordinates[5]), BadCargo(*coordinates[6])]
-        
-        return self._get_observation()
-    
-    def _to_coord(self, idx):
-        return (idx // self.map_size, idx % self.map_size)
-    
+        # 定義 Observation Space (原本 environment.py 的矩陣形狀)
+        # Shape: (4, MAP_SIZE, MAP_SIZE)
+        self.observation_space = spaces.Box(
+            low=0,
+            high=1.0,
+            shape=(4, self.map_size, self.map_size),
+            dtype=np.float32
+        )
+
     def _get_observation(self):
         obs = np.zeros((4, self.map_size, self.map_size), dtype=np.float32)
         
-        rx, ry = self.robot_pos
+        # Layer 0: Robot
+        rx, ry = self.game.robot_pos
         obs[0, rx, ry] = 1.0
         
-        if self.limit_cargo.active:
-            lx, ly = self.limit_cargo.pos
-            obs[1, lx, ly] = self.limit_cargo.remain_lifetime / self.limit_cargo.lifetime
-            #obs[1, lx, ly] = 1.0
+        # Layer 1: Limited Cargo
+        if self.game.limit_cargo.active:
+            lx, ly = self.game.limit_cargo.pos
+            # 計算生命週期比例
+            obs[1, lx, ly] = self.game.limit_cargo.remain_lifetime / self.game.limit_cargo.lifetime
             
-        for item in self.good_cargo:
+        # Layer 2: Good Cargo
+        for item in self.game.good_cargo:
             if item.active:
                 obs[2, item.row, item.col] = 1.0
             
-        for item in self.bad_cargo:
+        # Layer 3: Bad Cargo
+        for item in self.game.bad_cargo:
             if item.active:
                 obs[3, item.row, item.col] = 1.0
             
         return obs
-    
+
+    def reset(self, seed=None, options=None):
+        super().reset(seed=seed)
+        
+        # 呼叫遊戲核心的 reset
+        # 如果需要 seed，可以在 CargoGame 的 reset 實作 seed 參數
+        self.game.reset()
+        
+        if self.render_mode == 'human':
+            self.game.render()
+            
+        return self._get_observation(), {}
+
     def step(self, action):
-        self.steps += 1
-        rx, ry = self.robot_pos
-        x, y = rx, ry
+        # 1. 將整數動作轉換為 Enum
+        robot_action = rb.RobotAction(action)
         
-        # 0:上, 1:下, 2:左, 3:右
-        if action == 0: x -= 1
-        elif action == 1: x += 1
-        elif action == 2: y -= 1
-        elif action == 3: y += 1
+        # 2. 讓遊戲核心執行動作，只拿回 reward 和 done
+        reward, done = self.game.perform_action(robot_action)
         
-        reward = self.cfg.STEP_COST
+        # 3. 重新計算觀察值 (Observation)
+        obs = self._get_observation()
         
-        # 邊界檢查 (撞牆)
-        if x < 0 or x >= self.map_size or y < 0 or y >= self.map_size:
-            reward += -1 
-        else:
-            self.robot_pos = (x, y)
+        # 4. 處理 Render
+        if self.render_mode == 'human':
+            self.game.render()
+            
+        info = {}
+        
+        # 回傳標準 Gym 格式
+        return obs, reward, done, False, info
 
-        # 檢查高分包裹
-        self.limit_cargo.update()
-        if self.limit_cargo.active:
-            if self.robot_pos == self.limit_cargo.pos:
-                reward += self.limit_cargo.get_reward()
-        
-        # 檢查一般包裹
-        for pkg in self.good_cargo:
-            if pkg.active and self.robot_pos == pkg.pos:
-                reward += pkg.get_reward()
-            
-        # 檢查負分包裹
-        for pkg in self.bad_cargo:
-            if pkg.active and self.robot_pos == pkg.pos:
-                reward += pkg.get_reward()
-            
-        all_good_collected = True
-        if self.limit_cargo.active:
-            all_good_collected = False
-            
-        for pkg in self.good_cargo:
-            if pkg.active:
-                all_good_collected = False
-                break
-        
-        done = False
-        if all_good_collected:
-            done = True
-            reward += 20 # 給予清空全場的額外獎勵
-            
-        if self.steps >= self.cfg.MAX_STEPS:
-            done = True
-            
-        return self._get_observation(), reward, done
-    
     def render(self):
-        if self.render_mode == "rgb_array":
-            return self._render_frame()
-        elif self.render_mode == "human":
-            self._render_frame()
-            
-    def _init_pygame(self):
-        pygame.init()
-        pygame.display.init()
-        self.clock = pygame.time.Clock()
-        self.action_font = pygame.font.SysFont("Calibre",30)
-        self.cell_width = 64
-        self.cell_height = 64
-        self.window_size = (self.cell_width * self.map_size, self.cell_height * self.map_size)
-        self.window_surface = pygame.display.set_mode(self.window_size) 
-        
-        try:
-            base_path = path.dirname(__file__)
-            sprite_dir = path.join(base_path, "sprites")
-            self.robot_img = pygame.transform.scale(pygame.image.load(path.join(sprite_dir, "bot.png")), (64,64))
-            self.floor_img = pygame.transform.scale(pygame.image.load(path.join(sprite_dir, "floor.png")), (64,64))
-            self.limit_img = pygame.transform.scale(pygame.image.load(path.join(sprite_dir, "limit.png")), (64,64)) 
-            self.good_img = pygame.transform.scale(pygame.image.load(path.join(sprite_dir, "good.png")), (64,64)) 
-            self.bad_img = pygame.transform.scale(pygame.image.load(path.join(sprite_dir, "bad.png")), (64,64)) 
-        except:
-            print("Sprite loading failed, please check path.")
+        self.game.render()
 
-    def _render_frame(self):
-        if not hasattr(self, 'window_surface'): return
-        pix_size = 64
-        canvas = pygame.Surface(self.window_size)
-        canvas.fill((255, 255, 255))
+# 測試用
+if __name__ == "__main__":
+    env = gym.make('cargo-env-v0', render_mode='human')
+    obs, _ = env.reset()
+    print("Env Reset done. Obs shape:", obs.shape)
 
-        for r in range(self.map_size):
-            for c in range(self.map_size):
-                canvas.blit(self.floor_img, (c*pix_size, r*pix_size))
-              
-        if self.limit_cargo.active:
-            canvas.blit(self.limit_img, (self.limit_cargo.col * pix_size, self.limit_cargo.row * pix_size))
-        
-        for target in self.good_cargo:
-            if target.active:
-                canvas.blit(self.good_img, (target.col * pix_size, target.row * pix_size))
-        
-        for target in self.bad_cargo:
-            if target.active:
-                canvas.blit(self.bad_img, (target.col * pix_size, target.row * pix_size))
-                
-        r_row, r_col = self.robot_pos
-        canvas.blit(self.robot_img, (r_col * pix_size, r_row * pix_size))
-
-        self.window_surface.blit(canvas, canvas.get_rect())
-        pygame.event.pump()
-        pygame.display.update()
+    for _ in range(20):
+        action = env.action_space.sample()
+        obs, reward, done, _, _ = env.step(action)
+        if done:
+            env.reset()
