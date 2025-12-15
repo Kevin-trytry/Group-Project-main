@@ -12,3 +12,8 @@ class Config:
         self.MAX_STEPS = 100      # 每回合最大步數 (防止死循環)
         self.EPISODES = 3000      # 總訓練回合數  
         self.STEP_COST = -0.1      # 每走一步的消耗 (鼓勵最短路徑)
+        
+        # 各類貨物的數量
+        self.NUM_LIMIT =1
+        self.NUM_GOOD = 3
+        self.NUM_BAD = 2

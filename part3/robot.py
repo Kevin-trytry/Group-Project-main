@@ -39,14 +39,24 @@ class CargoGame:
         self.steps = 0
         self.score = 0
         
-        # 隨機生成位置 (1 Robot + 1 Limit + 3 Good + 2 Bad = 7 positions)
-        positions = random.sample(range(self.map_size * self.map_size), 7) 
+        # 隨機生成位置
+        total_cargo = self.cfg.NUM_LIMIT + self.cfg.NUM_GOOD + self.cfg.NUM_BAD
+        positions = random.sample(range(self.map_size * self.map_size), total_cargo) 
         coordinates = [self._to_coord(pos) for pos in positions]
         
         self.robot_pos = tuple(coordinates[0])
-        self.limit_cargo = LimitedCargo(*coordinates[1])
-        self.good_cargo = [GoodCargo(*coordinates[2]), GoodCargo(*coordinates[3]), GoodCargo(*coordinates[4])]
-        self.bad_cargo = [BadCargo(*coordinates[5]), BadCargo(*coordinates[6])]
+        
+        start = 1
+        end = self.cfg.NUM_LIMIT
+        self.limit_cargo = [LimitedCargo(*c) for c in coordinates[start : end]]
+        
+        start = self.cfg.NUM_LIMIT + 1
+        end = self.cfg.NUM_GOOD + self.cfg.NUM_LIMIT
+        self.good_cargo = [GoodCargo(*c) for c in coordinates[start : end]]
+        
+        start = self.cfg.NUM_LIMIT + self.cfg.NUM_GOOD + 1
+        end = self.cfg.NUM_LIMIT + self.cfg.NUM_GOOD + self.cfg.NUM_BAD
+        self.bad_cargo = [BadCargo(*c) for c in coordinates[start : end]]
 
     def _to_coord(self, idx):
         return (idx // self.map_size, idx % self.map_size)
@@ -73,9 +83,9 @@ class CargoGame:
 
         # 檢查限時包裹
         self.limit_cargo.update() # 更新限時包裹狀態
-        if self.limit_cargo.active:
-            if self.robot_pos == self.limit_cargo.pos:
-                reward += self.limit_cargo.get_reward()
+        for pkg in self.limit_cargo:
+            if pkg.active and self.robot_pos == pkg.pos:
+                reward += pkg.get_reward()
         
         # 檢查一般包裹 (Good)
         for pkg in self.good_cargo:
@@ -89,8 +99,10 @@ class CargoGame:
             
         # 判斷遊戲是否結束 (Done)
         all_good_collected = True
-        if self.limit_cargo.active:
-            all_good_collected = False
+        for pkg in self.limit_cargo:
+            if pkg.active:
+                all_good_collected = False
+                break
             
         for pkg in self.good_cargo:
             if pkg.active:
@@ -151,9 +163,10 @@ class CargoGame:
             for c in range(self.map_size):
                 canvas.blit(self.sprites['floor'], (c*pix_size, r*pix_size))
               
-        if self.limit_cargo.active:
-            canvas.blit(self.sprites['limit'], (self.limit_cargo.col * pix_size, self.limit_cargo.row * pix_size))
-        
+        for target in self.limit_cargo:
+            if target.active:
+                canvas.blit(self.sprites['limit'], (target.col * pix_size, target.row * pix_size))
+                
         for target in self.good_cargo:
             if target.active:
                 canvas.blit(self.sprites['good'], (target.col * pix_size, target.row * pix_size))
