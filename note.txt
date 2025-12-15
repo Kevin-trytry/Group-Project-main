@@ -62,3 +62,13 @@ code 修正
 2. environment.py 中，貨物的數量可以不要寫死，修改config，讓貨物數量固定，Limit_cargo資料形態要注意 - Winston
 3. Cargo名字改成檔名 - 大莊
 
+Demo 講解分配
+part2：德正
+part3：
+    Config：Winston
+    Cargo：莊志文
+    Robot：德正
+    Environment：德正
+    DQNAgent：Winston
+    main：莊志文
+    UML：莊志文

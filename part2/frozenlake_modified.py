@@ -26,7 +26,7 @@ def run(episodes, is_training=True, render=False):
     min_lr = 0.01
     
     # 2. 獎懲機制
-    hole_penalty = -0.2
+    hole_penalty = -0.5
     step_penalty = -0.001
     dest_reward = 1.5
 
@@ -103,7 +103,7 @@ def run(episodes, is_training=True, render=False):
     
     if is_training == False:
         win = np.sum(rewards_per_episode) / episodes * 100
-        print(f"✅ Success Rate: {win:.2f}% ({int(np.sum(rewards_per_episode))} / {episodes} episodes)")
+        print(f"Success Rate: {win:.2f}% ({int(np.sum(rewards_per_episode))} / {episodes} episodes)")
         total_win += win
 
     if is_training:
@@ -112,7 +112,7 @@ def run(episodes, is_training=True, render=False):
         f.close()
 
 if __name__ == '__main__':
-    print("🔥 開始修正後訓練 (LR Decay, Hole -0.1)...")
+    print("Training after fixing (LR Decay, Hole -0.1)...")
     run(15000, is_training=True, render=False)
 
     print("\ntesting section (1000 times each round):")
