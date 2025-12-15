@@ -58,24 +58,25 @@ python frozenlake_modified.py
 The Part 3 entry point is main.py. You can toggle between Training and Demo modes by editing the code.
 
 To Train the Agent:
-    1. Open main.py.
-    2. Set the run command to: run(is_training=True, render=False)
-    3. Execute:
-
 ```bash
+#1. Open main.py.
+#2. Set the run command to: run(is_training=True, render=False)
+#3. Execute:
 python main.py
 ```
-To Run the Demo (Test Mode):
-    1. Open main.py.
-    2. Set the run command to: run(is_training=False, render=True)
-    3. Execute:
 
+To Run the Demo (Test Mode):
 ```bash
+#1. Open main.py.
+#2. Set the run command to: run(is_training=False, render=True)
+#3. Execute:
 python main.py
 ```
 
 ### **Part 4: Contribution list**
+```bash
 Name       Student ID	Task / Contribution
 尤振德	    B123040021   Part2 Implementation, Part3 environment.py, robot.py, and prepared slides
 林雲翔      B123040033	 Part3 Implemented ddqn_agent.py, designed the Neural Network structure, tuned hyperparameters, and prepared slides
 莊志文	    B123040004   Part3 cargo.py and main.py, Managed GitHub repository wrote README and reflection report, and prepared slides.
+```
