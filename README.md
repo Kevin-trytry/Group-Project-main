@@ -75,8 +75,8 @@ python main.py
 
 ### **Part 4: Contribution list**
 ```bash
-Name       Student ID	Task / Contribution
+Name       Student ID   Task / Contribution
 尤振德      B123040021   Part2 Implementation, Part3 environment.py, robot.py, and prepared slides
-林雲翔      B123040033	 Part3 Implemented ddqn_agent.py, designed the Neural Network structure, tuned hyperparameters, and prepared slides
+林雲翔      B123040033   Part3 Implemented ddqn_agent.py, designed the Neural Network structure, tuned hyperparameters, and prepared slides
 莊志文      B123040004   Part3 cargo.py and main.py, Managed GitHub repository wrote README and reflection report, and prepared slides.
 ```
