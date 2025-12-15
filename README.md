@@ -1,11 +1,17 @@
 # Group Project Setup Guide
 
-## Project Content
-- Gymnasium v1.2.2
-- Part1 Sample Code
-- Part2 Sample Code
-- Part3 Sample Code
-  
+# OOP Final Project - Reinforcement Learning Robot
+
+**Team:** Group 22
+**Course:** Object-Oriented Programming
+
+## 1. Project Overview
+This project explores Reinforcement Learning (RL) across three different environments:
+- **Part 1: Mountain Car** (Classic Control)
+- **Part 2: Frozen Lake** (Tabular Q-Learning with Reward Shaping)
+- **Part 3: Autonomous Cargo Collector** (Deep Q-Network with OOP Architecture)
+---
+
 ## Installation
 
 ```bash
@@ -28,31 +34,6 @@ pip install matplotlib
 
 ---
 
-## ✅ Verification
-
-Run the following command to verify that the installation is successful:
-
-```bash
-% pip list
-```
-
-Sample Output from MacOS:
-
-```
-Package              Version Editable project location
--------------------- ------- --------------------------------------------
-cloudpickle          3.1.2
-Farama-Notifications 0.0.4
-gymnasium            1.2.2   ./group_project/Gymnasium
-numpy                2.3.5
-pip                  24.3.1
-typing_extensions    4.15.0
-```
-
-If your output matches the above (or is similar), your environment is correctly configured.
-
----
-
 ## 🚀 Running the Project
 
 ### **Part 1: Mountain Car**
@@ -70,22 +51,31 @@ python mountain_car.py --render --episodes 10
 Run the Frozen Lake environment:
 
 ```bash
-python frozen_lake.py
+python frozenlake_modified.py
 ```
 
-### **Part 3: OOP Project Environment**
-Execute the custom OOP environment:
+### **Part 3: DQN learning robot Project Environment**
+The Part 3 entry point is main.py. You can toggle between Training and Demo modes by editing the code.
+
+To Train the Agent:
+    1. Open main.py.
+    2. Set the run command to: run(is_training=True, render=False)
+    3. Execute:
 
 ```bash
-python oop_project_env.py
+python main.py
+```
+To Run the Demo (Test Mode):
+    1. Open main.py.
+    2. Set the run command to: run(is_training=False, render=True)
+    3. Execute:
+
+```bash
+python main.py
 ```
 
-**Tip:**  
-If you’re on Windows, replace  
-```bash
-source .venv/bin/activate
-```  
-with  
-```bash
-.venv\Scripts\activate
-```
+### **Part 4: Contribution list**
+Name       Student ID	Task / Contribution
+尤振德	    B123040021   Part2 Implementation, Part3 environment.py, robot.py, and prepared slides
+林雲翔      B123040033	 Part3 Implemented ddqn_agent.py, designed the Neural Network structure, tuned hyperparameters, and prepared slides
+莊志文	    B123040004   Part3 cargo.py and main.py, Managed GitHub repository wrote README and reflection report, and prepared slides.
