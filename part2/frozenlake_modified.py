@@ -8,7 +8,7 @@ total_win = 0
 def run(episodes, is_training=True, render=False):
     global total_win
 
-    env = gym.make('FrozenLake-v1', map_name="8x8", is_slippery=True, render_mode='human' if render else None)
+    env = gym.make('FrozenLake-v1', map_name="8x8", is_slippery=True, render_mode='human' if render else None, max_episode_steps=100)
 
     if(is_training):
         q = np.zeros((env.observation_space.n, env.action_space.n))
@@ -18,7 +18,7 @@ def run(episodes, is_training=True, render=False):
             q = pickle.load(f)
             f.close()
         except FileNotFoundError:
-            print("❌ 找不到模型檔案！")
+            print("找不到模型檔案！")
             return
     
     # 1. 學習率：動態衰減 

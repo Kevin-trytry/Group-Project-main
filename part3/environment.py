@@ -2,7 +2,7 @@ import gymnasium as gym
 from gymnasium import spaces
 import numpy as np
 from gymnasium.envs.registration import register
-
+    
 import robot as rb  # 匯入遊戲邏輯
 from config import Config
 

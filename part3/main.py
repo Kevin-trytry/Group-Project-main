@@ -105,7 +105,7 @@ def run(is_training=True, render=False):
 
 if __name__ == "__main__":
     # 1. 訓練模式
-    run(is_training=True, render=False)
+    #run(is_training=True, render=False)
 
     # 2. 測試模式 (要看畫面請把這裡取消註解，並把上面註解掉)
     run(is_training=False, render=True)
